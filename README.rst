@@ -1,9 +1,10 @@
 chimera-xephem plugin
 =====================
 
+Links `XEphem`_ ephemeris software to chimera using an unix `FIFO`_.
+
 .. image:: https://github.com/astroufsc/chimera-xephem/raw/master/docs/screenshot.png
 
-This plugin makes the link between `XEphem`_ ephemeris software and chimera using an unix `FIFO`_.
 
 Usage
 -----
@@ -34,9 +35,10 @@ Configuration Example
 ::
 
     controllers:
-        type: XEphem
+      - type: XEphem
         name: xe
-        fifo_dir: /usr/local/share/xephem/fifos  # Usually the path to the fifo_dir is fifos in the XEphem root.
+        telescope: /FakeTelescope/fake  # Not needed if you have only one telescope configured. Optional.
+        fifo_dir: /usr/local/share/xephem/fifos  # Usually the path to the fifo_dir is fifos in the XEphem root. Optional.
 
 
 Contact
