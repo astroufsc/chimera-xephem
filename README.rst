@@ -1,56 +1,42 @@
-chimera-template plugin
-=======================
+chimera-xephem plugin
+=====================
 
-This is a template plugin for the chimera observatory control system
-https://github.com/astroufsc/chimera.
+.. image:: https://github.com/astroufsc/chimera-xephem/raw/master/docs/screenshot.png
+
+This plugin makes the link between `XEphem`_ ephemeris software and chimera using an unix `FIFO`_.
 
 Usage
 -----
 
-Rename chimera_template for your plugin name. It is important that the plugin
-name must start with chimera\_ to be found by chimera. Instruments and
-controllers must follow the standard ``chimera_(plugin_name)/(instruments|controllers)/(plugin).py``
+Just install it and configure accordingly to the example below.
 
-The class inside ``(plugin).py`` should be named Plugin (with CamelCase letters).
+If the configuration is okay, you should see in chimera.log (debug mode) when the telescope change its position something like::
 
-For more info: https://github.com/astroufsc/chimera/blob/master/docs/site/chimerafordevs.rst#chimera-objects
+    22-07-2015 14:09:20.598 [localhost:7666] INFO chimera.xephem (xephem) xephem.py:38 Updated telescope position with status OK
+    22-07-2015 14:09:20.599 [localhost:7666] INFO chimera.xephem (xephem) xephem.py:46 Updating sky marker: RA:0.186 Dec:0.720
+
+and, when you send a Telescope GoTo command from XEphem::
+
+    22-07-2015 14:19:53.489 [localhost:7666] INFO chimera.xephem (xephem) xephem.py:100 XEphem FIFO changed: slewing to 03:24:19.400 +49:51:40.000
 
 
 Installation
 ------------
 
-Installation instructions. Dependencies, etc...
-
 ::
 
-   pip install -U chimera_template
-
-or
-
-::
-
-    pip install -U git+https://github.com/astroufsc/chimera-template.git
+    pip install -U git+https://github.com/astroufsc/chimera-xephem.git
 
 
 Configuration Example
 ---------------------
 
-Here goes an example of the configuration to be added on ``chimera.config`` file.
-
 ::
 
-    instrument:
-        name: model
-        type: Example
-
-
-Tested Hardware (for instruments)
----------------------------------
-
-This plugin was tested on these hardware:
-
-* Hardware example 1, model 2
-* Hardware example 2, model 3
+    controllers:
+        type: XEphem
+        name: xe
+        fifo_dir: /usr/local/share/xephem/fifos  # Usually the path to the fifo_dir is fifos in the XEphem root.
 
 
 Contact
@@ -60,4 +46,7 @@ For more information, contact us on chimera's discussion list:
 https://groups.google.com/forum/#!forum/chimera-discuss
 
 Bug reports and patches are welcome and can be sent over our GitHub page:
-https://github.com/astroufsc/chimera-template/
+https://github.com/astroufsc/chimera-xephem/
+
+.. _XEphem: http://www.clearskyinstitute.com/xephem/
+.. _FIFO: https://en.wikipedia.org/wiki/Named_pipe
