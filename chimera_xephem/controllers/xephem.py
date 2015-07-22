@@ -33,7 +33,9 @@ class XEphem (ChimeraObject):
     def _getTel(self):
         return self.getManager().getProxy(self["telescope"])
 
-    def _updateSlewPosition(self, position):
+    def _updateSlewPosition(self, position, status):
+
+        self.log.info('Updated telescope position with status %s' % status)
 
         try:
             # force non-blocking open
@@ -41,7 +43,7 @@ class XEphem (ChimeraObject):
             out_fifo = os.fdopen(fd, "w")
 
             mark = "RA:%.3f Dec:%.3f" % (position.ra.R, position.dec.R)
-            self.log.debug("Updating sky marker: %s" % mark)
+            self.log.info("Updating sky marker: %s" % mark)
 
             out_fifo.write(mark)
             out_fifo.flush()
@@ -51,16 +53,18 @@ class XEphem (ChimeraObject):
         except OSError, e:
             # ENXIO (no such device or address): XEphem closed
             if e.errno == 6:
-                pass
+                self.log.info("Not updating marker. XEphem is closed.")
             else:
-                self.log.exception("Error updating sky marker")
+                self.log.error("Error updating sky marker: %s" % e)
+        except Exception, e:
+            self.log.error("Error updating sky marker: %s" % e)
 
     def __main__(self):
 
         tel = self._getTel()
         tel.slewComplete += self.getProxy()._updateSlewPosition
 
-        self._updateSlewPosition(tel.getPositionRaDec())
+        self._updateSlewPosition(tel.getPositionRaDec(), None)
 
         # From man(7) fifo: The FIFO must be opened on both ends
         #(reading and writing) before data can be passed.  Normally,
