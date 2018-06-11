@@ -9,7 +9,8 @@ from select import select
 class XEphem (ChimeraObject):
 
     __config__ = {"telescope": "/Telescope/0",
-                  "fifo_dir": "/usr/local/share/xephem/fifos"}
+                  "fifo_dir": "/usr/local/share/xephem/fifos",
+                  "position_update_frequency": 0}
 
     def __init__(self):
         ChimeraObject.__init__(self)
@@ -17,7 +18,15 @@ class XEphem (ChimeraObject):
         self._in_fifo = None
         self._out_fifo = None
 
+        self.error = False
+
     def __start__(self):
+
+        if self["position_update_frequency"] != 0:
+            self.log.debug("Setting position update frequency to %3.2f Hz" % self["position_update_frequency"])
+            self.setHz(self["position_update_frequency"])
+
+        self._telescope = self.getManager().getProxy(self["telescope"])
 
         self._out_fifo = os.path.join(self["fifo_dir"], "xephem_in_fifo")
         self._in_fifo = os.path.join(self["fifo_dir"], "xephem_loc_fifo")
@@ -30,12 +39,17 @@ class XEphem (ChimeraObject):
                     self.log.exception("Couldn't create XEphem FIFOs.")
                     raise
 
+    def control(self):
+        self._updateSlewPosition(self._getTel(), None)
+        return True
+
     def _getTel(self):
-        return self.getManager().getProxy(self["telescope"])
+        return self._telescope
 
     def _updateSlewPosition(self, position, status):
 
-        self.log.info('Updated telescope position with status %s' % status)
+        if status is not None:
+            self.log.info('Updated telescope position with status %s' % status)
 
         try:
             # force non-blocking open
